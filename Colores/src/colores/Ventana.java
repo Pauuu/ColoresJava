@@ -19,13 +19,14 @@ public class Ventana extends JFrame {
     public Ventana() {
         this.setSize(500, 500);
         Container cp = this.getContentPane();
-        
 
         this.l = new Lienzo();
+        //this.l.convertToGrey();
         cp.add(l);
+
     }
-    
-    public Ventana getVentana(){
+
+    public Ventana getVentana() {
         return this;
     }
 }

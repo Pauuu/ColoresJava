@@ -13,18 +13,16 @@ import java.awt.image.Raster;
  *
  * @author pau
  */
-public class MyBuffImagen extends BufferedImage{
-    
-    
+public class MyBuffImagen extends BufferedImage {
+
     /*
         Poner metodos en static!!!!!!!!!!!!!!!!
-    */
-
-    public  MyBuffImagen(int width, int height, int imageType) {
+     */
+    public MyBuffImagen(int width, int height, int imageType) {
         super(width, height, imageType);
     }
-    
-        public static byte[] copyIntArrayToByteArray(Integer[] biSource) {
+
+    public static byte[] copyIntArrayToByteArray(Integer[] biSource) {
 
         byte[] isCopy = new byte[biSource.length];
 
@@ -45,13 +43,9 @@ public class MyBuffImagen extends BufferedImage{
 
         return isCopy;
     }
-    
-    
-    
-    public boolean comprobarProfundidad(Raster ras){
+
+    public boolean comprobarProfundidad(Raster ras) {
         return false;
     }
-    
-   
-    
+
 }
