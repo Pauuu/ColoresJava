@@ -22,11 +22,18 @@ public class Lienzo extends Canvas {
 
     public Lienzo() {
         this.loadImage();
-        this.test(baRaster);
+        this.test(this.baRaster);
         //this.getInfoImg(); //cambiar(?)
         this.convertToGrey();
         //this.aumentarBrillo(baRaster, 0);
 
+    }
+
+    public void copiarArrayIntsToBytes(Integer[] iArray) {
+
+        for (int i = 0; i < iArray.length; i++) {
+            baRaster[i] = iArray[i].byteValue();
+        }
     }
 
     public void test(byte[] bBytes) {
@@ -53,7 +60,7 @@ public class Lienzo extends Canvas {
     }
 
     public void aumentarBrillo(int nivel) {
-        Integer intArray[] = MyBuffImagen.copyByteArrayToIntArray(baRaster);
+        Integer intArray[] = MyBuffImagen.copyByteArrayToIntArray(this.baRaster);
 
         for (int i = 0; i < intArray.length; i = i + 3) {
 
@@ -61,15 +68,12 @@ public class Lienzo extends Canvas {
             intArray[i + 1] = intArray[i + 1] + nivel;
             intArray[i + 2] = intArray[i + 2] + nivel;
         }
-        
-        baRaster = MyBuffImagen.copyIntArrayToByteArray(intArray);
-
     }
 
     public void convertToGrey() {
 
         //Integer ba[] = new Integer[aBytes.length];
-        Integer intArray[] = MyBuffImagen.copyByteArrayToIntArray(baRaster);
+        Integer intArray[] = MyBuffImagen.copyByteArrayToIntArray(this.baRaster);
         Integer media;
 
         //cada tres bytes...
@@ -82,6 +86,7 @@ public class Lienzo extends Canvas {
             intArray[i + 1] = media;
             intArray[i + 2] = media;
 
+            /*
             //convertir resultado de ints a bytes
             Byte bMedia = media.byteValue();
 
@@ -89,9 +94,10 @@ public class Lienzo extends Canvas {
             baRaster[i] = bMedia;
             baRaster[i + 1] = bMedia;
             baRaster[i + 2] = bMedia;
+             */
         }
 
-        //aBytes = MyBuffImagen.copyIntArrayToByteArray(intArray);
+        this.copiarArrayIntsToBytes(intArray);
     }
 
     public byte[] copyDataRasterToByteArray(Raster ras) {
