@@ -16,88 +16,15 @@ import javax.imageio.ImageIO;
 public class Lienzo extends Canvas {
 
     private byte[] baRaster;
-    private BufferedImage imgOriginal;
+    private byte[] baRasterOriginal;
+    private BufferedImage imagen;
+    private Integer[] iaRaster;
     private MyBuffImagen imgNueva;
     private Raster rastDataImg;
 
     public Lienzo() {
         this.loadImage();
-        this.test(this.baRaster);
-        //this.getInfoImg(); //cambiar(?)
-        this.convertToGrey();
-        //this.aumentarBrillo(baRaster, 0);
 
-    }
-
-    public void copiarArrayIntsToBytes(Integer[] iArray) {
-
-        for (int i = 0; i < iArray.length; i++) {
-            baRaster[i] = iArray[i].byteValue();
-        }
-    }
-
-    public void test(byte[] bBytes) {
-
-        for (int i = 0; i < 12; i++) {
-            System.out.println(bBytes[i] + "-> original");
-        }
-        System.out.println("-----------------------------------------");
-
-        Integer intA[] = MyBuffImagen.copyByteArrayToIntArray(bBytes);
-
-        for (int i = 0; i < 12; i++) {
-            System.out.println(intA[i] + "-> int");
-        }
-
-        System.out.println("-----------------------------------------");
-
-        byte byteA[] = MyBuffImagen.copyIntArrayToByteArray(intA);
-
-        for (int i = 0; i < 12; i++) {
-            System.out.println(byteA[i] + "-> byte");
-        }
-
-    }
-
-    public void aumentarBrillo(int nivel) {
-        Integer intArray[] = MyBuffImagen.copyByteArrayToIntArray(this.baRaster);
-
-        for (int i = 0; i < intArray.length; i = i + 3) {
-
-            intArray[i] = intArray[i] + nivel;
-            intArray[i + 1] = intArray[i + 1] + nivel;
-            intArray[i + 2] = intArray[i + 2] + nivel;
-        }
-    }
-
-    public void convertToGrey() {
-
-        //Integer ba[] = new Integer[aBytes.length];
-        Integer intArray[] = MyBuffImagen.copyByteArrayToIntArray(this.baRaster);
-        Integer media;
-
-        //cada tres bytes...
-        for (int i = 0; i < intArray.length; i += 3) {
-
-            //media de los tres primeros
-            media = (intArray[i] + intArray[i + 1] + intArray[i + 2]) / 3;
-
-            intArray[i] = media;
-            intArray[i + 1] = media;
-            intArray[i + 2] = media;
-
-            /*
-            //convertir resultado de ints a bytes
-            Byte bMedia = media.byteValue();
-
-            //asignar media a los tres primeros bytes 
-            baRaster[i] = bMedia;
-            baRaster[i + 1] = bMedia;
-            baRaster[i + 2] = bMedia;
-             */
-        }
-
-        this.copiarArrayIntsToBytes(intArray);
     }
 
     public byte[] copyDataRasterToByteArray(Raster ras) {
@@ -106,7 +33,6 @@ public class Lienzo extends Canvas {
 
         //comprueba que la imagen sea compatible para q no pete el programa
         if (ras.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE) {
-
             System.out.println("Imagen no compatible");
             return null;   //saltar excepcion mas q valor nulo
         }
@@ -117,19 +43,51 @@ public class Lienzo extends Canvas {
         return baDataRasterSource;
     }
 
+    public void convertIntArrayToBaRaster(Integer[] iArray) {
+
+        byte[] bArray = MyBuffImagen.copyIntArrayToByteArray(iArray);
+        for (int i = 0; i < bArray.length; i++) {
+            baRaster[i] = bArray[i];
+        }
+    }
+
+    public void convertToGrey() {
+
+        Integer media;
+
+        //cada tres bytes...
+        for (int i = 0; i < this.iaRaster.length; i += 3) {
+
+            //media de los tres primeros
+            media = (this.iaRaster[i] + this.iaRaster[i + 1] + this.iaRaster[i + 2]) / 3;
+
+            this.iaRaster[i] = media;
+            this.iaRaster[i + 1] = media;
+            this.iaRaster[i + 2] = media;
+        }
+
+        this.convertIntArrayToBaRaster(this.iaRaster);
+    }
+
     public void getInfoImg() {
 
         //obtiene el rast de la imagen
-        this.rastDataImg = this.imgOriginal.getRaster();
+        this.rastDataImg = this.imagen.getRaster();
 
         //obtiene la informacion del array de bytes del raster
         this.baRaster = this.copyDataRasterToByteArray(this.rastDataImg);
+
+        //convierte el baRaster en un array de integers
+        this.iaRaster = MyBuffImagen.copyByteArrayToIntArray(this.baRaster);
+
+        //copia para poder restaurar la imagen
+        this.makeByteArrayCopy(baRaster);
     }
 
     public void loadImage() {
 
         try {
-            this.imgOriginal = ImageIO.read(new File("img/fondo2.jpeg"));
+            this.imagen = ImageIO.read(new File("img/fondo2.jpeg"));
             this.getInfoImg();  //guarda el obj Raster y el byteArray del raster
 
         } catch (Exception e) {
@@ -137,9 +95,40 @@ public class Lienzo extends Canvas {
         }
     }
 
+    private void makeByteArrayCopy(byte[] ba) {
+        for (int i = 0; i < ba.length; i++) {
+            this.baRasterOriginal[i] = ba[i];
+        }
+    }
+
+    public void modifyBrightness(int nivel) {
+
+        for (int i = 0; i < this.iaRaster.length; i++) {
+
+            this.iaRaster[i] += nivel;
+
+            if (this.iaRaster[i] > 255) {
+                this.iaRaster[i] = 255;
+
+            } else if (this.iaRaster[i] < 0) {
+                this.iaRaster[i] = 0;
+            }
+        }
+
+        this.convertIntArrayToBaRaster(this.iaRaster);
+    }
+
+    public void restoreImg() {
+        
+        for (int i = 0; i < baRaster.length; i++) {
+            this.baRaster[i] = this.baRasterOriginal[i];
+        }
+
+    }
+
     @Override
     public void paint(Graphics g) {
-        g.drawImage(this.imgOriginal, 0, 0, this.imgOriginal.getWidth(), this.imgOriginal.getHeight(), this);
+        g.drawImage(this.imagen, 0, 0, this.imagen.getWidth(), this.imagen.getHeight(), this);
     }
 
     public Lienzo getLienzo() {

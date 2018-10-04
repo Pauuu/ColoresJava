@@ -13,13 +13,14 @@ import java.awt.image.Raster;
  *
  * @author pau
  */
-public class MyBuffImagen extends BufferedImage {
+public class MyBuffImagen {
 
-    /*
-        Poner metodos en static!!!!!!!!!!!!!!!!
-     */
-    public MyBuffImagen(int width, int height, int imageType) {
-        super(width, height, imageType);
+    private byte[] baRaster;
+    private BufferedImage imgOriginal;
+    private MyBuffImagen imgNueva;
+    private Raster rastDataImg;
+   
+    public MyBuffImagen() {
     }
 
     public static byte[] copyIntArrayToByteArray(Integer[] biSource) {
